@@ -4,7 +4,7 @@ import Box from "./Box";
 export default function Scene() {
   return (
     <>
-      <Box />
+      <Box position={[0, 0, 0]} />
       {Array.from({ length: 150 }, (_, i) => (
         <Ball
           key={i}

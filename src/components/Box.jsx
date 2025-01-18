@@ -1,52 +1,51 @@
-import React from "react";
-import { useBox } from "@react-three/cannon";
+/* eslint-disable react/no-unknown-property */
+import { RigidBody } from "@react-three/rapier";
 
-export default function Box() {
-  // Create the bottom plane (floor)
-  useBox(() => ({
-    args: [10, 0.1, 10],
-    position: [0, -5, 0],
-    type: "Static",
-  }));
+const THICKNESS = 0.1;
+const LADO_SIZE = 15;
 
+// eslint-disable-next-line react/prop-types
+export default function Box({ position }) {
   // Wall properties
   const wallProps = [
-    { position: [0, 0, -5], args: [10, 10, 0.1] }, // Back wall
-    { position: [0, 0, 5], args: [10, 10, 0.1] }, // Front wall
-    { position: [-5, 0, 0], args: [0.1, 10, 10] }, // Left wall
-    { position: [5, 0, 0], args: [0.1, 10, 10] }, // Right wall
+    {
+      position: [0, 0, -LADO_SIZE / 2],
+      args: [LADO_SIZE, LADO_SIZE, THICKNESS],
+    }, // Back wall
+    {
+      position: [0, 0, LADO_SIZE / 2],
+      args: [LADO_SIZE, LADO_SIZE, THICKNESS],
+    }, // Front wall
+    {
+      position: [-LADO_SIZE / 2, 0, 0],
+      args: [THICKNESS, LADO_SIZE, LADO_SIZE],
+    }, // Left wall
+    {
+      position: [LADO_SIZE / 2, 0, 0],
+      args: [THICKNESS, LADO_SIZE, LADO_SIZE],
+    }, // Right wall
   ];
 
   return (
-    <>
-      {/* Transparent walls */}
-      {wallProps.map((props, i) => (
-        <mesh key={i} position={props.position}>
-          <boxGeometry args={props.args} />
-          <meshBasicMaterial
-            color="green"
-            transparent
-            opacity={0.3}
-            wireframe
-          />
+    <RigidBody
+      type="fixed"
+      mass={1} // The box will have mass
+      position={position} // Initial position of the box
+      colliders="hull" // Use hull collider to fit the box without top
+    >
+      {/* Bottom face */}
+      <mesh position={[0, -LADO_SIZE / 2, 0]}>
+        <boxGeometry args={[LADO_SIZE, THICKNESS, LADO_SIZE]} />
+        <meshStandardMaterial color={"orange"} />
+      </mesh>
+
+      {/* Wall faces */}
+      {wallProps.map(({ position, args }, index) => (
+        <mesh key={index} position={position}>
+          <boxGeometry args={args} />
+          <meshStandardMaterial transparent wireframe />
         </mesh>
       ))}
-
-      {/* Cannon.js walls */}
-      {wallProps.map((props, i) => (
-        <React.Fragment key={i}>
-          <Wall position={props.position} args={props.args} />
-        </React.Fragment>
-      ))}
-    </>
+    </RigidBody>
   );
-}
-
-function Wall({ position, args }) {
-  useBox(() => ({
-    args,
-    position,
-    type: "Static", // Static so it doesn't move
-  }));
-  return null;
 }
