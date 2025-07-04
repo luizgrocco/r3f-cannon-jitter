@@ -43,7 +43,7 @@ export default function Box({ position }) {
       {wallProps.map(({ position, args }, index) => (
         <mesh key={index} position={position}>
           <boxGeometry args={args} />
-          <meshStandardMaterial transparent wireframe />
+          <meshStandardMaterial color={"orange"} transparent opacity={0.01} />
         </mesh>
       ))}
     </RigidBody>
